@@ -151,7 +151,7 @@ end
 
 local autoTpMiningCave = createToggleButton(MainTabFrame, "Auto tp to Mining cave", 5)
 local autoBuyAuraEggs = createToggleButton(EventTabFrame, "Auto Buy Aura Eggs", 5)
-local autoBuyAuraShards = createToggleButton(EventTabFrame, "Auto Buy Aura Shards", 40)
+local autoBuyAuraShardsToggle = createToggleButton(EventTabFrame, "Auto Buy Aura Shards", 40)
 
 local tabButtons = {
     MainButton = MainTabFrame,
@@ -203,9 +203,12 @@ RunService.RenderStepped:Connect(function(delta)
     end
 end)
 
--- Auto TP to Mining Cave logic
+-- Logic Variables
 local teleporting = false
+local auraEggsEnabled = false
+local auraShardsEnabled = false
 
+-- Teleport Logic
 local function teleportLoop()
     while teleporting do
         local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
@@ -237,10 +240,7 @@ autoTpMiningCave[2].MouseButton1Click:Connect(function()
     end
 end)
 
--- Auto Buy Aura Eggs and Shards logic
-local auraEggsEnabled = false
-local auraShardsEnabled = false
-
+-- Auto Buy Aura Eggs
 local function autoBuyAuraEgg()
     while auraEggsEnabled do
         for i = 1, 4 do
@@ -253,7 +253,8 @@ local function autoBuyAuraEgg()
     end
 end
 
-local function autoBuyAuraShards()
+-- Auto Buy Aura Shards
+local function runAutoBuyAuraShards()
     while auraShardsEnabled do
         for i = 1, 10 do
             local success, err = pcall(function()
@@ -273,14 +274,15 @@ autoBuyAuraEggs[2].MouseButton1Click:Connect(function()
     end
 end)
 
-autoBuyAuraShards[2].MouseButton1Click:Connect(function()
+autoBuyAuraShardsToggle[2].MouseButton1Click:Connect(function()
     auraShardsEnabled = not auraShardsEnabled
-    autoBuyAuraShards[3].Visible = auraShardsEnabled
+    autoBuyAuraShardsToggle[3].Visible = auraShardsEnabled
     if auraShardsEnabled then
-        task.spawn(autoBuyAuraShards)
+        task.spawn(runAutoBuyAuraShards)
     end
 end)
 
+-- Toggle GUI
 local toggleGuiButton = Instance.new("TextButton")
 toggleGuiButton.Name = "ToggleGuiButton"
 toggleGuiButton.Text = "☰"
@@ -294,10 +296,7 @@ toggleGuiButton.TextSize = 24
 toggleGuiButton.Parent = screenGui
 
 local guiVisible = true
-
 toggleGuiButton.MouseButton1Click:Connect(function()
     guiVisible = not guiVisible
     MainGuiFrame.Visible = guiVisible
 end)
-
--- (Rest of script remains unchanged: Hide/Show GUI + drag logic...)

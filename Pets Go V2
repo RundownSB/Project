@@ -229,7 +229,7 @@ local function teleportLoop()
     end
 end
 
-autoTpMiningCave[2].Activated:Connect(function()
+autoTpMiningCave[2].MouseButton1Click:Connect(function()
     teleporting = not teleporting
     autoTpMiningCave[3].Visible = teleporting
     if teleporting then
@@ -237,14 +237,15 @@ autoTpMiningCave[2].Activated:Connect(function()
     end
 end)
 
--- Auto Buy Aura Eggs
+-- Auto Buy Aura Eggs and Shards logic
 local auraEggsEnabled = false
+local auraShardsEnabled = false
+
 local function autoBuyAuraEgg()
     while auraEggsEnabled do
         for i = 1, 4 do
-            local args = { "AuraEggMerchant", i }
             local success, err = pcall(function()
-                ReplicatedStorage.Network.CustomMerchants_Purchase:InvokeServer(unpack(args))
+                ReplicatedStorage.Network.CustomMerchants_Purchase:InvokeServer("AuraEggMerchant", i)
             end)
             if not success then warn("Aura Egg error:", err) end
         end
@@ -252,22 +253,11 @@ local function autoBuyAuraEgg()
     end
 end
 
-autoBuyAuraEggs[2].Activated:Connect(function()
-    auraEggsEnabled = not auraEggsEnabled
-    autoBuyAuraEggs[3].Visible = auraEggsEnabled
-    if auraEggsEnabled then
-        task.spawn(autoBuyAuraEgg)
-    end
-end)
-
--- Auto Buy Aura Shards
-local auraShardsEnabled = false
 local function autoBuyAuraShards()
     while auraShardsEnabled do
         for i = 1, 10 do
-            local args = { i }
             local success, err = pcall(function()
-                ReplicatedStorage.Network.AuraMerchant_Purchase:InvokeServer(unpack(args))
+                ReplicatedStorage.Network.AuraMerchant_Purchase:InvokeServer(i)
             end)
             if not success then warn("Aura Shards error:", err) end
         end
@@ -275,7 +265,15 @@ local function autoBuyAuraShards()
     end
 end
 
-autoBuyAuraShards[2].Activated:Connect(function()
+autoBuyAuraEggs[2].MouseButton1Click:Connect(function()
+    auraEggsEnabled = not auraEggsEnabled
+    autoBuyAuraEggs[3].Visible = auraEggsEnabled
+    if auraEggsEnabled then
+        task.spawn(autoBuyAuraEgg)
+    end
+end)
+
+autoBuyAuraShards[2].MouseButton1Click:Connect(function()
     auraShardsEnabled = not auraShardsEnabled
     autoBuyAuraShards[3].Visible = auraShardsEnabled
     if auraShardsEnabled then

@@ -93,7 +93,6 @@ MainTabFrame.Visible = true
 
 local toggleStrokes = {}
 
--- Updated function: createToggleSquare now returns a TextButton toggle for mobile & desktop input support
 local function createToggleSquare(parent, position)
     local toggle = Instance.new("TextButton")
     toggle.Name = "Toggle"
@@ -147,7 +146,7 @@ local function createToggleButton(parent, text, yPos)
 
     local toggle, light = createToggleSquare(container, UDim2.new(1, -25, 0, 5))
 
-    return {container, toggle, light, false} -- toggled state false initially
+    return {container, toggle, light, false}
 end
 
 local autoTpMiningCave = createToggleButton(MainTabFrame, "Auto tp to Mining cave", 5)
@@ -230,7 +229,6 @@ local function teleportLoop()
     end
 end
 
--- Use .Activated so toggles work on both mobile taps and mouse clicks
 autoTpMiningCave[2].Activated:Connect(function()
     teleporting = not teleporting
     autoTpMiningCave[3].Visible = teleporting
@@ -239,19 +237,50 @@ autoTpMiningCave[2].Activated:Connect(function()
     end
 end)
 
--- Example for other toggles: add your logic as needed
+-- Auto Buy Aura Eggs
 local auraEggsEnabled = false
+local function autoBuyAuraEgg()
+    while auraEggsEnabled do
+        for i = 1, 4 do
+            local args = { "AuraEggMerchant", i }
+            local success, err = pcall(function()
+                ReplicatedStorage.Network.CustomMerchants_Purchase:InvokeServer(unpack(args))
+            end)
+            if not success then warn("Aura Egg error:", err) end
+        end
+        task.wait(1)
+    end
+end
+
 autoBuyAuraEggs[2].Activated:Connect(function()
     auraEggsEnabled = not auraEggsEnabled
     autoBuyAuraEggs[3].Visible = auraEggsEnabled
-    -- Add your auto buy aura eggs logic here
+    if auraEggsEnabled then
+        task.spawn(autoBuyAuraEgg)
+    end
 end)
 
+-- Auto Buy Aura Shards
 local auraShardsEnabled = false
+local function autoBuyAuraShards()
+    while auraShardsEnabled do
+        for i = 1, 10 do
+            local args = { i }
+            local success, err = pcall(function()
+                ReplicatedStorage.Network.AuraMerchant_Purchase:InvokeServer(unpack(args))
+            end)
+            if not success then warn("Aura Shards error:", err) end
+        end
+        task.wait(1)
+    end
+end
+
 autoBuyAuraShards[2].Activated:Connect(function()
     auraShardsEnabled = not auraShardsEnabled
     autoBuyAuraShards[3].Visible = auraShardsEnabled
-    -- Add your auto buy aura shards logic here
+    if auraShardsEnabled then
+        task.spawn(autoBuyAuraShards)
+    end
 end)
 
 local toggleGuiButton = Instance.new("TextButton")

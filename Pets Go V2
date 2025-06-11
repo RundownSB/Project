@@ -93,16 +93,17 @@ MainTabFrame.Visible = true
 
 local toggleStrokes = {}
 
+-- Updated function: createToggleSquare now returns a TextButton toggle for mobile & desktop input support
 local function createToggleSquare(parent, position)
-    local toggle = Instance.new("Frame")
+    local toggle = Instance.new("TextButton")
     toggle.Name = "Toggle"
     toggle.Parent = parent
     toggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     toggle.BorderSizePixel = 0
     toggle.Size = UDim2.new(0, 20, 0, 20)
     toggle.Position = position
-    toggle.Active = true
-    toggle.Selectable = true
+    toggle.AutoButtonColor = false
+    toggle.Text = ""
     toggle.ZIndex = 2
 
     local stroke = Instance.new("UIStroke")
@@ -146,7 +147,7 @@ local function createToggleButton(parent, text, yPos)
 
     local toggle, light = createToggleSquare(container, UDim2.new(1, -25, 0, 5))
 
-    return {container, toggle, light, false} -- Added a "toggled" state
+    return {container, toggle, light, false} -- toggled state false initially
 end
 
 local autoTpMiningCave = createToggleButton(MainTabFrame, "Auto tp to Mining cave", 5)
@@ -229,14 +230,28 @@ local function teleportLoop()
     end
 end
 
-autoTpMiningCave[2].InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        teleporting = not teleporting
-        autoTpMiningCave[3].Visible = teleporting
-        if teleporting then
-            task.spawn(teleportLoop)
-        end
+-- Use .Activated so toggles work on both mobile taps and mouse clicks
+autoTpMiningCave[2].Activated:Connect(function()
+    teleporting = not teleporting
+    autoTpMiningCave[3].Visible = teleporting
+    if teleporting then
+        task.spawn(teleportLoop)
     end
+end)
+
+-- Example for other toggles: add your logic as needed
+local auraEggsEnabled = false
+autoBuyAuraEggs[2].Activated:Connect(function()
+    auraEggsEnabled = not auraEggsEnabled
+    autoBuyAuraEggs[3].Visible = auraEggsEnabled
+    -- Add your auto buy aura eggs logic here
+end)
+
+local auraShardsEnabled = false
+autoBuyAuraShards[2].Activated:Connect(function()
+    auraShardsEnabled = not auraShardsEnabled
+    autoBuyAuraShards[3].Visible = auraShardsEnabled
+    -- Add your auto buy aura shards logic here
 end)
 
 local toggleGuiButton = Instance.new("TextButton")
@@ -259,4 +274,3 @@ toggleGuiButton.MouseButton1Click:Connect(function()
 end)
 
 -- (Rest of script remains unchanged: Hide/Show GUI + drag logic...)
--- Add your remaining sections here as needed.

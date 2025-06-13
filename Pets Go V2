@@ -256,7 +256,7 @@ end
 -- Auto Buy Aura Shards
 local function runAutoBuyAuraShards()
     while auraShardsEnabled do
-        for i = 1, 10 do
+        for i = 1, 12 do
             local success, err = pcall(function()
                 ReplicatedStorage.Network.AuraMerchant_Purchase:InvokeServer(i)
             end)
